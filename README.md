@@ -1,3 +1,4 @@
+<img width="1400" height="900" alt="overview" src="https://github.com/user-attachments/assets/f081f913-2972-4d0c-bb95-94be3b10c744" />
 # OpenHome 2.0.0
 
 OpenHome 2.0 is a Linux-native OpenAction plugin for discovering and controlling accessories exposed by Homebridge Config UI.
