@@ -29,10 +29,6 @@ Download `openhome-2.0.0-linux-universal.streamDeckPlugin` from the release asse
 
 Homebridge Config UI must be reachable. Homebridge must run in insecure mode (`-I`) for accessory reads and writes. Keep the Config UI port restricted to a trusted network.
 
-## Upgrade notes
-
-The project is now named **OpenHome** and uses the new plugin/action namespace `com.jamessenecal.openhome`. Because OpenDeck identifies actions by UUID, actions created with the former namespace are not migrated automatically. Install OpenHome, recreate each action, select the Homebridge service again, verify control, and then remove the former package.
-
 ## Release assets
 
 - Universal OpenDeck package with x86_64 and aarch64 binaries
@@ -44,3 +40,8 @@ The project is now named **OpenHome** and uses the new plugin/action namespace `
 
 - Homebridge credentials are stored through OpenDeck's global plugin settings API. Protect the Linux account and OpenDeck configuration directory.
 - Homebridge's accessory API requires insecure mode (`-I`), despite still requiring Config UI authentication when enabled.
+
+## Credits
+- [OpenDeck](https://github.com/nekename/OpenDeck)  
+- [streamdeck-homebridge](https://github.com/sergey-tihon/streamdeck-homebridge)  
+- [Homebridge](https://github.com/homebridge/homebridge)  
