@@ -343,6 +343,7 @@ impl AccessoryService {
         })
     }
 
+    #[allow(clippy::collapsible_if)]
     pub fn characteristic_by_identity(
         &self,
         characteristic_uuid: &str,

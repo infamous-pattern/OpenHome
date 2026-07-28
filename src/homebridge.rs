@@ -11,8 +11,8 @@ use serde_json::{Map, Value, json};
 use tokio::sync::RwLock;
 
 use crate::models::{
-    AccessoryService, AuthenticationStatus, Catalog, CatalogService, Characteristic,
-    DeviceMetadata, GlobalSettings, RoomLayout,
+    AccessoryService, AuthenticationStatus, Catalog, CatalogService, DeviceMetadata,
+    GlobalSettings, RoomLayout,
 };
 
 #[derive(Debug, Clone)]
@@ -85,7 +85,7 @@ impl HomebridgeClient {
         let client = Client::builder()
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(20))
-            .user_agent("OpenHome/2.0.0")
+            .user_agent("OpenHomeB/2.0.1")
             .build()
             .context("could not create the Homebridge HTTP client")?;
 
@@ -109,6 +109,7 @@ impl HomebridgeClient {
         self.clear_catalogs().await;
     }
 
+    #[allow(clippy::collapsible_if)]
     pub async fn catalog(
         &self,
         settings: &GlobalSettings,
@@ -393,6 +394,7 @@ impl HomebridgeClient {
         bail!("Homebridge authentication failed")
     }
 
+    #[allow(clippy::collapsible_if)]
     async fn token(
         &self,
         base_url: &str,
@@ -568,6 +570,7 @@ fn parse_accessory_service(value: Value) -> Result<AccessoryService> {
         .context("Homebridge returned an unsupported accessory service structure")
 }
 
+#[allow(clippy::collapsible_if)]
 fn normalise_service_value(value: Value) -> Result<Value> {
     let mut object = value
         .as_object()
@@ -683,6 +686,7 @@ fn legacy_permission_can_write(service: &Map<String, Value>, characteristic_type
         .is_some_and(|items| items.iter().any(|item| item.as_str() == Some("pw")))
 }
 
+#[allow(clippy::collapsible_if)]
 fn normalise_characteristic_value(value: Value) -> Result<Value> {
     let mut object = value
         .as_object()

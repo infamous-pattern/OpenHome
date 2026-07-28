@@ -1,23 +1,23 @@
-# OpenHome
+# OpenHomeB
 
 A Linux-native OpenDeck/OpenAction plugin for discovering and controlling accessories exposed by Homebridge Config UI.
 
-**Current version: 2.0.0**
+**Current version: 2.0.1**
 
-![OpenHome overview](docs/screenshots/overview.png)
+![OpenHomeB overview](docs/screenshots/overview.png)
 
 <details>
 <summary>Action screenshots</summary>
 
-![OpenHome device discovery](docs/screenshots/device-discovery.png)
+![OpenHomeB device discovery](docs/screenshots/device-discovery.png)
 
-![OpenHome Switch action](docs/screenshots/switch-action.png)
+![OpenHomeB Switch action](docs/screenshots/switch-action.png)
 
-![OpenHome Brightness action](docs/screenshots/brightness-action.png)
+![OpenHomeB Brightness action](docs/screenshots/brightness-action.png)
 
 </details>
 
-Version 2.0 expands the working Switch implementation with dedicated brightness controls, shared discovery caching, proactive authentication renewal, richer device metadata, compatibility parsing, and configurable button labels.
+Version 2.0.1 includes the complete 2.0 feature set and release-build validation fixes. Version 2.0 expanded the working Switch implementation with dedicated brightness controls, shared discovery caching, proactive authentication renewal, richer device metadata, compatibility parsing, and configurable button labels.
 
 ## Highlights
 
@@ -39,7 +39,7 @@ Version 2.0 expands the working Switch implementation with dedicated brightness 
 
 | Action | Controller | Behaviour |
 |---|---|---|
-| **OpenHome Devices** | Keypad | Lists discovered devices, rooms, services, characteristics, and hardware metadata. |
+| **OpenHomeB Devices** | Keypad | Lists discovered devices, rooms, services, characteristics, and hardware metadata. |
 | **Switch** | Keypad | Reads and displays a writable Boolean state, toggles it on `keyDown`, confirms the write, and refreshes periodically. |
 | **Brightness** | Keypad or Encoder | Reads and displays brightness, increases/decreases/sets/cycles values on a key or encoder press, and adjusts relatively when an encoder is rotated. |
 | **Set State** | Keypad | Writes a configured Boolean, number, or string to a writable characteristic. |
@@ -48,7 +48,7 @@ Version 2.0 expands the working Switch implementation with dedicated brightness 
 
 ## Rename and migration
 
-OpenHome uses the new plugin and action namespace `com.jamessenecal.openhome`. This fully removes the former project namespace from the codebase, but OpenDeck treats the renamed actions as new actions. After installing OpenHome, re-add each action to the desired key or encoder and select its Homebridge service again. The previous package can then be removed after the new actions are confirmed working.
+OpenHomeB uses the new plugin and action namespace `com.infamous-pattern.openhomeb`. This fully removes the former project namespace from the codebase, but OpenDeck treats the renamed actions as new actions. After installing OpenHomeB, re-add each action to the desired key or encoder and select its Homebridge service again. The previous package can then be removed after the new actions are confirmed working.
 
 ## Homebridge requirements
 
@@ -60,7 +60,7 @@ OpenHome uses the new plugin and action namespace `com.jamessenecal.openhome`. T
 
 ```bash
 sudo dnf install -y rust cargo gcc zip
-cd openhome
+cd openhomeb
 chmod +x scripts/*.sh
 ./scripts/build-fedora.sh
 ```
@@ -68,7 +68,7 @@ chmod +x scripts/*.sh
 The installable package is created at:
 
 ```text
-dist/com.jamessenecal.openhome.streamDeckPlugin
+dist/com.infamous-pattern.openhomeb.streamDeckPlugin
 ```
 
 The local build contains the architecture of the Fedora machine. The included GitHub Actions workflow builds and packages both supported Linux architectures.
@@ -76,7 +76,7 @@ The local build contains the architecture of the Fedora machine. The included Gi
 ## Install and connect
 
 1. Install the generated `.streamDeckPlugin` file through OpenDeck's **Plugins** screen.
-2. Add an OpenHome action to a key or encoder.
+2. Add an OpenHomeB action to a key or encoder.
 3. Enter the Homebridge UI address, such as `http://10.52.10.19:8581`.
 4. Enter credentials only when Homebridge Config UI authentication is enabled.
 5. Select **Save and connect**.
@@ -174,7 +174,7 @@ Authenticated mode:
 Run the source-level validation suite:
 
 ```bash
-node --check assets/propertyInspector/openhome.js
+node --check assets/propertyInspector/openhomeb.js
 node test/test_property_inspector.js
 python3 -m unittest discover -v
 ```
@@ -195,8 +195,8 @@ The current OpenAction settings API stores the Homebridge username and password 
 
 ```text
 assets/manifest.json                         OpenDeck action definitions
-assets/propertyInspector/openhome.html     Property inspector UI
-assets/propertyInspector/openhome.js       Discovery, settings, filtering, and diagnostics
+assets/propertyInspector/openhomeb.html     Property inspector UI
+assets/propertyInspector/openhomeb.js       Discovery, settings, filtering, and diagnostics
 src/homebridge.rs                            REST client, authentication, caching, and parsing
 src/models.rs                                Settings and Homebridge data models
 src/actions/brightness.rs                    Key and encoder brightness action

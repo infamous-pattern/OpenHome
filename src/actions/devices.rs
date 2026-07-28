@@ -7,7 +7,7 @@ use crate::actions::common::{apply_global_settings, parse_request, send_catalog}
 use crate::models::EmptySettings;
 use crate::state::PluginState;
 
-const ACTION_UUID: ActionUuid = "com.jamessenecal.openhome.devices";
+const ACTION_UUID: ActionUuid = "com.infamous-pattern.openhomeb.devices";
 
 pub struct HomebridgeDevicesAction {
     state: Arc<PluginState>,

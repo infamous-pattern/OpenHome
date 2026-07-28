@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PLUGIN_ID="com.jamessenecal.openhome"
+PLUGIN_ID="com.infamous-pattern.openhomeb"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="${ROOT_DIR}/dist"
 PLUGIN_DIR="${DIST_DIR}/${PLUGIN_ID}.sdPlugin"
-BINARY="openhome"
+BINARY="openhomeb"
 TARGET="${1:-}"
 
 for command in cargo rustc zip; do

@@ -6,7 +6,7 @@ mod poller;
 mod state;
 
 use actions::{
-    AdjustStateAction, BrightnessAction, HomebridgeDevicesAction, OpenHomebridgeUiAction,
+    AdjustStateAction, BrightnessAction, HomebridgeDevicesAction, LaunchHomebridgeUiAction,
     SetStateAction, SwitchAction,
 };
 use global_handler::HomebridgeGlobalEventHandler;
@@ -28,7 +28,7 @@ async fn main() -> OpenActionResult<()> {
     }
 
     let state = PluginState::new().unwrap_or_else(|error| {
-        panic!("Unable to initialise the OpenHome plugin: {error}")
+        panic!("Unable to initialise the OpenHomeB plugin: {error}")
     });
 
     let global_handler = Box::leak(Box::new(HomebridgeGlobalEventHandler::new(state.clone())));
@@ -39,7 +39,7 @@ async fn main() -> OpenActionResult<()> {
     register_action(SetStateAction::new(state.clone())).await;
     register_action(AdjustStateAction::new(state.clone())).await;
     register_action(BrightnessAction::new(state.clone())).await;
-    register_action(OpenHomebridgeUiAction::new(state.clone())).await;
+    register_action(LaunchHomebridgeUiAction::new(state.clone())).await;
 
     spawn_state_poller(state);
     run(std::env::args().collect()).await

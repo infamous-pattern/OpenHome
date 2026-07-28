@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.1 — 2026-07-28
+
+- Renamed the project and plugin to OpenHomeB.
+- Changed the plugin ID and action namespace to `com.infamous-pattern.openhomeb`.
+- Renamed the Rust binary, property-inspector assets, build outputs, release files, workflows, documentation, and screenshots to use OpenHomeB/openhomeb.
+- Removed personal-name references from project metadata and source files.
+- Fixed GitHub release validation failures caused by unused imports and Clippy warnings promoted to errors.
+- Updated GitHub Actions checkout steps to `actions/checkout@v5`.
+- Split release validation into discrete formatting, test, Clippy, JavaScript, and Python steps.
+- Preserved the complete 2.0 feature set and Homebridge behaviour.
+
 ## 2.0.0 — 2026-07-27
 
 - Added a dedicated Brightness action supporting OpenDeck keys and encoders.

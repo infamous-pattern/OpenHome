@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'assets/propertyInspector/openhome.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'assets/propertyInspector/openhomeb.js'), 'utf8');
 const context = vm.createContext({
   console,
   URL,
@@ -14,7 +14,7 @@ const context = vm.createContext({
   setTimeout,
   clearTimeout
 });
-vm.runInContext(source, context, { filename: 'openhome.js' });
+vm.runInContext(source, context, { filename: 'openhomeb.js' });
 
 function normalise(value) {
   return vm.runInContext(`normaliseHomebridgeUrl(${JSON.stringify(value)})`, context);

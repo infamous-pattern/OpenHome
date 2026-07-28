@@ -11,7 +11,7 @@ use crate::actions::common::{
 use crate::models::{AccessoryService, Characteristic, SelectedCharacteristic, SwitchSettings};
 use crate::state::PluginState;
 
-pub const SWITCH_UUID: ActionUuid = "com.jamessenecal.openhome.switch";
+pub const SWITCH_UUID: ActionUuid = "com.infamous-pattern.openhomeb.switch";
 
 pub struct SwitchAction {
     state: Arc<PluginState>,
@@ -22,6 +22,7 @@ impl SwitchAction {
         Self { state }
     }
 
+    #[allow(clippy::collapsible_if)]
     async fn toggle(
         &self,
         instance: &Instance,

@@ -8,7 +8,7 @@ Contributions should preserve Linux support, saved-settings compatibility, and t
 cargo fmt --check
 cargo test --all-targets
 cargo clippy --all-targets -- -D warnings
-node --check assets/propertyInspector/openhome.js
+node --check assets/propertyInspector/openhomeb.js
 node test/test_property_inspector.js
 python3 -m unittest discover -v
 ```

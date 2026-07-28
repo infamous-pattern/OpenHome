@@ -10,20 +10,20 @@ use crate::homebridge::normalise_base_url;
 use crate::models::EmptySettings;
 use crate::state::PluginState;
 
-const ACTION_UUID: ActionUuid = "com.jamessenecal.openhome.config-ui";
+const ACTION_UUID: ActionUuid = "com.infamous-pattern.openhomeb.config-ui";
 
-pub struct OpenHomebridgeUiAction {
+pub struct LaunchHomebridgeUiAction {
     state: Arc<PluginState>,
 }
 
-impl OpenHomebridgeUiAction {
+impl LaunchHomebridgeUiAction {
     pub fn new(state: Arc<PluginState>) -> Self {
         Self { state }
     }
 }
 
 #[openaction::async_trait]
-impl Action for OpenHomebridgeUiAction {
+impl Action for LaunchHomebridgeUiAction {
     type Settings = EmptySettings;
     const UUID: ActionUuid = ACTION_UUID;
 

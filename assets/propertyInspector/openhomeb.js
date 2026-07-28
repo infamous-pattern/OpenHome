@@ -1,12 +1,12 @@
 'use strict';
 
 const ACTIONS = {
-  'com.jamessenecal.openhome.devices': { kind: 'devices', title: 'OpenHome Devices' },
-  'com.jamessenecal.openhome.switch': { kind: 'switch', title: 'Switch' },
-  'com.jamessenecal.openhome.brightness': { kind: 'brightness', title: 'Brightness' },
-  'com.jamessenecal.openhome.set': { kind: 'set', title: 'Set State' },
-  'com.jamessenecal.openhome.adjust': { kind: 'adjust', title: 'Adjust State' },
-  'com.jamessenecal.openhome.config-ui': { kind: 'openUi', title: 'Open Homebridge UI' }
+  'com.infamous-pattern.openhomeb.devices': { kind: 'devices', title: 'OpenHomeB Devices' },
+  'com.infamous-pattern.openhomeb.switch': { kind: 'switch', title: 'Switch' },
+  'com.infamous-pattern.openhomeb.brightness': { kind: 'brightness', title: 'Brightness' },
+  'com.infamous-pattern.openhomeb.set': { kind: 'set', title: 'Set State' },
+  'com.infamous-pattern.openhomeb.adjust': { kind: 'adjust', title: 'Adjust State' },
+  'com.infamous-pattern.openhomeb.config-ui': { kind: 'openUi', title: 'Open Homebridge UI' }
 };
 
 let websocket = null;
@@ -73,7 +73,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
   actionUUID = info.action;
   contextUUID = info.context;
   actionSettings = info.payload.settings || {};
-  actionKind = (ACTIONS[actionUUID] || ACTIONS['com.jamessenecal.openhome.devices']).kind;
+  actionKind = (ACTIONS[actionUUID] || ACTIONS['com.infamous-pattern.openhomeb.devices']).kind;
 
   websocket = new WebSocket(`ws://localhost:${inPort}`);
   websocket.onopen = () => {
@@ -87,7 +87,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 }
 
 function configureForAction() {
-  const meta = ACTIONS[actionUUID] || { title: 'OpenHome', kind: actionKind };
+  const meta = ACTIONS[actionUUID] || { title: 'OpenHomeB', kind: actionKind };
   elements.actionTitle.textContent = meta.title;
   const needsSelection = ['switch', 'brightness', 'set', 'adjust'].includes(actionKind);
   elements.selectionPanel.hidden = !needsSelection;

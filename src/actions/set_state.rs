@@ -10,7 +10,7 @@ use crate::actions::common::{
 use crate::models::{SelectedCharacteristic, SetStateSettings};
 use crate::state::PluginState;
 
-const ACTION_UUID: ActionUuid = "com.jamessenecal.openhome.set";
+const ACTION_UUID: ActionUuid = "com.infamous-pattern.openhomeb.set";
 
 pub struct SetStateAction {
     state: Arc<PluginState>,

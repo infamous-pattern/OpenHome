@@ -6,7 +6,7 @@
 2. Open OpenDeck and go to **Plugins**.
 3. Install the downloaded package.
 4. Restart OpenDeck.
-5. Add an OpenHome action to a key or encoder.
+5. Add an OpenHomeB action to a key or encoder.
 6. Enter the Homebridge Config UI address, usually `http://homebridge.local:8581`.
 7. Enter credentials only when Config UI authentication is enabled.
 8. Select **Save and connect**.
@@ -21,7 +21,7 @@ Homebridge must run with the `-I` argument so Homebridge Config UI can read and 
 sudo dnf install -y rust cargo gcc zip git
 
 git clone <repository-url>
-cd openhome
+cd openhomeb
 chmod +x scripts/*.sh
 ./scripts/build-fedora.sh
 ```
@@ -29,7 +29,7 @@ chmod +x scripts/*.sh
 The package is created at:
 
 ```text
-dist/com.jamessenecal.openhome.streamDeckPlugin
+dist/com.infamous-pattern.openhomeb.streamDeckPlugin
 ```
 
 ## Verify a downloaded release
@@ -38,6 +38,6 @@ dist/com.jamessenecal.openhome.streamDeckPlugin
 sha256sum -c SHA256SUMS --ignore-missing
 ```
 
-## Renaming from the previous package
+## Migration from an earlier package
 
-OpenHome uses the plugin identifier `com.jamessenecal.openhome`. Existing actions created under the former identifier are not automatically reassigned by OpenDeck. Install OpenHome, add the replacement actions, select the Homebridge services again, verify operation, and then remove the former package.
+OpenHomeB uses the plugin identifier `com.infamous-pattern.openhomeb`. Existing actions created under another identifier are not automatically reassigned by OpenDeck. Install OpenHomeB, add the replacement actions, select the Homebridge services again, verify operation, and then remove the earlier package.

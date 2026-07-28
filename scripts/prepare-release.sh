@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${1:-2.0.0}"
-PLUGIN_ID="com.jamessenecal.openhome"
-BINARY="openhome"
+VERSION="${1:-2.0.1}"
+PLUGIN_ID="com.infamous-pattern.openhomeb"
+BINARY="openhomeb"
 ASSET_DIR="${ROOT_DIR}/release-assets"
 
 rm -rf "${ASSET_DIR}"
@@ -16,7 +16,7 @@ package="${ROOT_DIR}/dist/${PLUGIN_ID}.streamDeckPlugin"
   exit 1
 }
 
-cp "${package}" "${ASSET_DIR}/openhome-${VERSION}-linux.streamDeckPlugin"
+cp "${package}" "${ASSET_DIR}/openhomeb-${VERSION}-linux-universal.streamDeckPlugin"
 
 for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
   binary="${ROOT_DIR}/release/${target}/${BINARY}"
@@ -27,11 +27,16 @@ done
 
 (
   cd "${ROOT_DIR}"
-  zip -qr "${ASSET_DIR}/openhome-${VERSION}-source.zip" \
+  zip -qr "${ASSET_DIR}/openhomeb-${VERSION}-source.zip" \
     . -x '.git/*' 'target/*' 'dist/*' 'release/*' 'release-assets/*'
 )
 
-cp "${ROOT_DIR}/RELEASE_NOTES_2.0.0.md" "${ASSET_DIR}/"
+notes_file="${ROOT_DIR}/RELEASE_NOTES_${VERSION}.md"
+[[ -f "${notes_file}" ]] || {
+  echo "Missing release notes: ${notes_file}" >&2
+  exit 1
+}
+cp "${notes_file}" "${ASSET_DIR}/"
 (
   cd "${ASSET_DIR}"
   sha256sum * > SHA256SUMS

@@ -10,7 +10,7 @@ use crate::actions::common::{
 use crate::models::{AdjustStateSettings, Characteristic, SelectedCharacteristic};
 use crate::state::PluginState;
 
-pub const ADJUST_UUID: ActionUuid = "com.jamessenecal.openhome.adjust";
+pub const ADJUST_UUID: ActionUuid = "com.infamous-pattern.openhomeb.adjust";
 
 pub struct AdjustStateAction {
     state: Arc<PluginState>,

@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem with the OpenHome plugin
+description: Report a reproducible problem with the OpenHomeB plugin
 title: "[Bug]: "
 labels: [bug]
 body:
@@ -10,7 +10,7 @@ body:
     id: version
     attributes:
       label: Plugin version
-      placeholder: 2.0.0
+      placeholder: 2.0.1
     validations:
       required: true
   - type: input

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PLUGIN_ID="com.jamessenecal.openhome"
+PLUGIN_ID="com.infamous-pattern.openhomeb"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 INPUT_DIR="${1:?Usage: package-universal.sh DIRECTORY_CONTAINING_TARGET_FOLDERS}"
 DIST_DIR="${ROOT_DIR}/dist"
 PLUGIN_DIR="${DIST_DIR}/${PLUGIN_ID}.sdPlugin"
-BINARY="openhome"
+BINARY="openhomeb"
 
 rm -rf "${PLUGIN_DIR}"
 mkdir -p "${PLUGIN_DIR}"

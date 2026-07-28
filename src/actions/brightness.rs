@@ -13,7 +13,7 @@ use crate::models::{
 };
 use crate::state::PluginState;
 
-pub const BRIGHTNESS_UUID: ActionUuid = "com.jamessenecal.openhome.brightness";
+pub const BRIGHTNESS_UUID: ActionUuid = "com.infamous-pattern.openhomeb.brightness";
 
 pub struct BrightnessAction {
     state: Arc<PluginState>,
@@ -46,6 +46,7 @@ impl BrightnessAction {
         self.handle_result(instance, settings, result, true).await
     }
 
+    #[allow(clippy::collapsible_if)]
     async fn calculate_and_write(
         &self,
         settings: &BrightnessSettings,

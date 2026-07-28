@@ -1,15 +1,15 @@
 {
-  "Name": "OpenHome",
-  "Description": "OpenHome controls Homebridge accessories from OpenDeck on Linux with live state, brightness, caching, and token management.",
-  "Author": "James Senecal",
-  "Version": "2.0.0",
+  "Name": "OpenHomeB",
+  "Description": "OpenHomeB controls Homebridge accessories from OpenDeck on Linux with live state, brightness, caching, and token management.",
+  "Author": "Infamous Pattern",
+  "Version": "2.0.1",
   "CodePaths": {
-    "x86_64-unknown-linux-gnu": "x86_64-unknown-linux-gnu/bin/openhome",
-    "aarch64-unknown-linux-gnu": "aarch64-unknown-linux-gnu/bin/openhome"
+    "x86_64-unknown-linux-gnu": "x86_64-unknown-linux-gnu/bin/openhomeb",
+    "aarch64-unknown-linux-gnu": "aarch64-unknown-linux-gnu/bin/openhomeb"
   },
-  "CodePathLin": "x86_64-unknown-linux-gnu/bin/openhome",
+  "CodePathLin": "x86_64-unknown-linux-gnu/bin/openhomeb",
   "Icon": "icons/plugin",
-  "Category": "OpenHome",
+  "Category": "OpenHomeB",
   "CategoryIcon": "icons/plugin",
   "OS": [
     {
@@ -19,7 +19,7 @@
   "Actions": [
     {
       "Icon": "icons/devices",
-      "Name": "OpenHome Devices",
+      "Name": "OpenHomeB Devices",
       "States": [
         {
           "Image": "icons/devices"
@@ -30,8 +30,8 @@
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "Connect to Homebridge and list its devices.",
-      "UUID": "com.jamessenecal.openhome.devices",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.devices",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     },
     {
       "Icon": "icons/switch-on",
@@ -51,8 +51,8 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle a Boolean Homebridge characteristic.",
-      "UUID": "com.jamessenecal.openhome.switch",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.switch",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     },
     {
       "Icon": "icons/brightness",
@@ -72,8 +72,8 @@
       },
       "SupportedInMultiActions": true,
       "Tooltip": "Read, set, increase, decrease, or cycle a Homebridge Brightness characteristic.",
-      "UUID": "com.jamessenecal.openhome.brightness",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.brightness",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     },
     {
       "Icon": "icons/set-state",
@@ -88,8 +88,8 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Set a Homebridge characteristic to a fixed value.",
-      "UUID": "com.jamessenecal.openhome.set",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.set",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     },
     {
       "Icon": "icons/adjust-state",
@@ -107,8 +107,8 @@
       },
       "SupportedInMultiActions": false,
       "Tooltip": "Adjust a numeric Homebridge characteristic with an encoder.",
-      "UUID": "com.jamessenecal.openhome.adjust",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.adjust",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     },
     {
       "Icon": "icons/open-ui",
@@ -123,8 +123,8 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Open the configured Homebridge UI in the default browser.",
-      "UUID": "com.jamessenecal.openhome.config-ui",
-      "PropertyInspectorPath": "propertyInspector/openhome.html"
+      "UUID": "com.infamous-pattern.openhomeb.config-ui",
+      "PropertyInspectorPath": "propertyInspector/openhomeb.html"
     }
   ]
 }

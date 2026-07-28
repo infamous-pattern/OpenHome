@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing version tag to release, for example v2.0.0
+        description: Existing version tag to release, for example v2.0.1
         required: true
         type: string
 
@@ -19,8 +19,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BINARY_NAME: openhome
-  PLUGIN_ID: com.jamessenecal.openhome
+  BINARY_NAME: openhomeb
+  PLUGIN_ID: com.infamous-pattern.openhomeb
 
 jobs:
   validate:
@@ -30,14 +30,24 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - name: Validate source
-        run: |
-          cargo fmt --check
-          cargo test --all-targets
-          cargo clippy --all-targets -- -D warnings
-          node --check assets/propertyInspector/openhome.js
-          node test/test_property_inspector.js
-          python3 -m unittest discover -v
+
+      - name: Rust formatting
+        run: cargo fmt --all -- --check
+
+      - name: Rust tests
+        run: cargo test --all-targets
+
+      - name: Rust Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Property inspector syntax
+        run: node --check assets/propertyInspector/openhomeb.js
+
+      - name: Property inspector tests
+        run: node test/test_property_inspector.js
+
+      - name: Homebridge API and package contracts
+        run: python3 -m unittest discover -v
 
   build:
     needs: validate
@@ -142,7 +152,7 @@ jobs:
           mkdir -p release-assets
 
           cp "dist/${PLUGIN_ID}.streamDeckPlugin" \
-            "release-assets/openhome-${version}-linux-universal.streamDeckPlugin"
+            "release-assets/openhomeb-${version}-linux-universal.streamDeckPlugin"
 
           for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
             cp "release/${target}/${BINARY_NAME}" \
@@ -150,13 +160,15 @@ jobs:
           done
 
           git archive --format=zip \
-            --output="release-assets/openhome-${version}-source.zip" \
+            --output="release-assets/openhomeb-${version}-source.zip" \
             HEAD
           git archive --format=tar.gz \
-            --output="release-assets/openhome-${version}-source.tar.gz" \
+            --output="release-assets/openhomeb-${version}-source.tar.gz" \
             HEAD
 
-          cp RELEASE_NOTES_2.0.0.md release-assets/
+          notes_file="RELEASE_NOTES_${version}.md"
+          test -f "${notes_file}"
+          cp "${notes_file}" release-assets/
           (
             cd release-assets
             sha256sum * > SHA256SUMS
@@ -185,8 +197,8 @@ jobs:
         run: |
           gh release view "${RELEASE_TAG}" >/dev/null 2>&1 || \
             gh release create "${RELEASE_TAG}" \
-              --title "OpenHome ${RELEASE_TAG#v}" \
-              --notes-file RELEASE_NOTES_2.0.0.md \
+              --title "OpenHomeB ${RELEASE_TAG#v}" \
+              --notes-file "RELEASE_NOTES_${RELEASE_TAG#v}.md" \
               --verify-tag
 
           gh release upload "${RELEASE_TAG}" release-assets/* --clobber
