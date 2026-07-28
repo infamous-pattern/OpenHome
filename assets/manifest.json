@@ -1,0 +1,130 @@
+{
+  "Name": "OpenHome",
+  "Description": "OpenHome controls Homebridge accessories from OpenDeck on Linux with live state, brightness, caching, and token management.",
+  "Author": "James Senecal",
+  "Version": "2.0.0",
+  "CodePaths": {
+    "x86_64-unknown-linux-gnu": "x86_64-unknown-linux-gnu/bin/openhome",
+    "aarch64-unknown-linux-gnu": "aarch64-unknown-linux-gnu/bin/openhome"
+  },
+  "CodePathLin": "x86_64-unknown-linux-gnu/bin/openhome",
+  "Icon": "icons/plugin",
+  "Category": "OpenHome",
+  "CategoryIcon": "icons/plugin",
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
+  "Actions": [
+    {
+      "Icon": "icons/devices",
+      "Name": "OpenHome Devices",
+      "States": [
+        {
+          "Image": "icons/devices"
+        }
+      ],
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Connect to Homebridge and list its devices.",
+      "UUID": "com.jamessenecal.openhome.devices",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    },
+    {
+      "Icon": "icons/switch-on",
+      "Name": "Switch",
+      "States": [
+        {
+          "Image": "icons/switch-off",
+          "Title": "Off"
+        },
+        {
+          "Image": "icons/switch-on",
+          "Title": "On"
+        }
+      ],
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle a Boolean Homebridge characteristic.",
+      "UUID": "com.jamessenecal.openhome.switch",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    },
+    {
+      "Icon": "icons/brightness",
+      "Name": "Brightness",
+      "States": [
+        {
+          "Image": "icons/brightness",
+          "Title": "Brightness"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1"
+      },
+      "SupportedInMultiActions": true,
+      "Tooltip": "Read, set, increase, decrease, or cycle a Homebridge Brightness characteristic.",
+      "UUID": "com.jamessenecal.openhome.brightness",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    },
+    {
+      "Icon": "icons/set-state",
+      "Name": "Set State",
+      "States": [
+        {
+          "Image": "icons/set-state"
+        }
+      ],
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set a Homebridge characteristic to a fixed value.",
+      "UUID": "com.jamessenecal.openhome.set",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    },
+    {
+      "Icon": "icons/adjust-state",
+      "Name": "Adjust State",
+      "States": [
+        {
+          "Image": "icons/adjust-state"
+        }
+      ],
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1"
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Adjust a numeric Homebridge characteristic with an encoder.",
+      "UUID": "com.jamessenecal.openhome.adjust",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    },
+    {
+      "Icon": "icons/open-ui",
+      "Name": "Open Homebridge UI",
+      "States": [
+        {
+          "Image": "icons/open-ui"
+        }
+      ],
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Open the configured Homebridge UI in the default browser.",
+      "UUID": "com.jamessenecal.openhome.config-ui",
+      "PropertyInspectorPath": "propertyInspector/openhome.html"
+    }
+  ]
+}

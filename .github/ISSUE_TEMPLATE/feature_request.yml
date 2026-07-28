@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest a Homebridge action, device type, or usability improvement
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Explain what you are trying to control or monitor.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+    validations:
+      required: true
+  - type: input
+    id: characteristic
+    attributes:
+      label: Relevant Homebridge service or characteristic
+      placeholder: For example Lightbulb / Brightness

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Rust formatting
+        run: cargo fmt --check
+
+      - name: Rust tests
+        run: cargo test --all-targets
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Property inspector validation
+        run: |
+          node --check assets/propertyInspector/openhome.js
+          node test/test_property_inspector.js
+
+      - name: Homebridge API and package contracts
+        run: python3 -m unittest discover -v

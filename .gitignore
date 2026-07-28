@@ -1,0 +1,6 @@
+/target/
+/dist/
+/release/
+/release-assets/
+*.log
+.DS_Store

@@ -1,0 +1,192 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release, for example v2.0.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BINARY_NAME: openhome
+  PLUGIN_ID: com.jamessenecal.openhome
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Validate source
+        run: |
+          cargo fmt --check
+          cargo test --all-targets
+          cargo clippy --all-targets -- -D warnings
+          node --check assets/propertyInspector/openhome.js
+          node test/test_property_inspector.js
+          python3 -m unittest discover -v
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install aarch64 linker
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build release binary
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+        run: cargo build --release --target '${{ matrix.target }}'
+
+      - name: Verify binary
+        run: |
+          test -x "target/${{ matrix.target }}/release/${BINARY_NAME}"
+          file "target/${{ matrix.target }}/release/${BINARY_NAME}"
+
+      - name: Stage binary
+        run: |
+          mkdir -p "release/${{ matrix.target }}"
+          install -m 0755 \
+            "target/${{ matrix.target }}/release/${BINARY_NAME}" \
+            "release/${{ matrix.target }}/${BINARY_NAME}"
+          sha256sum "release/${{ matrix.target }}/${BINARY_NAME}" \
+            > "release/${{ matrix.target }}/${BINARY_NAME}.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: release/${{ matrix.target }}/
+          if-no-files-found: error
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: binary-*
+          path: downloaded
+
+      - name: Resolve release tag
+        id: version
+        env:
+          DISPATCH_TAG: ${{ inputs.tag }}
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            tag="${DISPATCH_TAG}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+          [[ "${tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Invalid release tag: ${tag}" >&2
+            exit 1
+          }
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Arrange binaries
+        run: |
+          mkdir -p release/x86_64-unknown-linux-gnu release/aarch64-unknown-linux-gnu
+          for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
+            install -m 0755 \
+              "downloaded/binary-${target}/${BINARY_NAME}" \
+              "release/${target}/${BINARY_NAME}"
+          done
+
+      - name: Package universal plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+          chmod +x scripts/*.sh
+          ./scripts/package-universal.sh release
+
+      - name: Build release assets
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          mkdir -p release-assets
+
+          cp "dist/${PLUGIN_ID}.streamDeckPlugin" \
+            "release-assets/openhome-${version}-linux-universal.streamDeckPlugin"
+
+          for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
+            cp "release/${target}/${BINARY_NAME}" \
+              "release-assets/${BINARY_NAME}-${version}-${target}"
+          done
+
+          git archive --format=zip \
+            --output="release-assets/openhome-${version}-source.zip" \
+            HEAD
+          git archive --format=tar.gz \
+            --output="release-assets/openhome-${version}-source.tar.gz" \
+            HEAD
+
+          cp RELEASE_NOTES_2.0.0.md release-assets/
+          (
+            cd release-assets
+            sha256sum * > SHA256SUMS
+          )
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: release-assets/
+          if-no-files-found: error
+
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: release-assets
+
+      - name: Create GitHub release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.package.outputs.tag }}
+        run: |
+          gh release view "${RELEASE_TAG}" >/dev/null 2>&1 || \
+            gh release create "${RELEASE_TAG}" \
+              --title "OpenHome ${RELEASE_TAG#v}" \
+              --notes-file RELEASE_NOTES_2.0.0.md \
+              --verify-tag
+
+          gh release upload "${RELEASE_TAG}" release-assets/* --clobber

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenHome</title>
+  <link rel="stylesheet" href="openhome.css">
+</head>
+<body>
+<main>
+  <section class="panel">
+    <h1 id="actionTitle">OpenHome</h1>
+    <label>
+      <span>Homebridge UI address</span>
+      <input id="homebridgeUrl" type="url" placeholder="http://homebridge.local:8581" autocomplete="url">
+    </label>
+    <label>
+      <span>Username</span>
+      <input id="username" type="text" autocomplete="username" placeholder="Only needed when authentication is enabled">
+    </label>
+    <label>
+      <span>Password</span>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Only needed when authentication is enabled">
+    </label>
+    <div class="inline three">
+      <label>
+        <span>State refresh (seconds)</span>
+        <input id="updateInterval" type="number" min="1" max="3600" step="1" value="5">
+      </label>
+      <label>
+        <span>Device cache (seconds)</span>
+        <input id="catalogCacheSeconds" type="number" min="5" max="3600" step="1" value="60">
+      </label>
+      <label>
+        <span>Two-factor code</span>
+        <input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Not saved">
+      </label>
+    </div>
+    <div class="button-row">
+      <button id="connectButton" type="button">Save and connect</button>
+      <button id="refreshButton" class="secondary" type="button">Refresh devices now</button>
+    </div>
+    <p class="notice">Connection details are shared across this plugin and are saved only when you select Save and connect. Device discovery is cached in the Rust plugin process and shared by all actions.</p>
+  </section>
+
+  <section id="selectionPanel" class="panel" hidden>
+    <h2>Homebridge control</h2>
+    <div class="inline">
+      <label>
+        <span>Room</span>
+        <select id="roomSelect"><option value="">All rooms</option></select>
+      </label>
+      <label>
+        <span>Device type</span>
+        <select id="deviceTypeSelect">
+          <option value="">All devices</option>
+          <option value="light">Lights and dimmers</option>
+          <option value="switch">Switches and outlets</option>
+          <option value="fan">Fans</option>
+          <option value="covering">Blinds and doors</option>
+          <option value="thermostat">Thermostats</option>
+          <option value="sensor">Sensors</option>
+        </select>
+      </label>
+    </div>
+    <label>
+      <span>Homebridge service</span>
+      <select id="serviceSelect"><option value="">Select a Homebridge service</option></select>
+    </label>
+    <label id="characteristicLabel">
+      <span>Writable characteristic</span>
+      <select id="characteristicSelect"><option value="">Select a characteristic</option></select>
+    </label>
+    <label>
+      <span>Custom button name</span>
+      <input id="displayName" type="text" placeholder="Uses the Homebridge service name by default">
+    </label>
+
+    <div id="labelPanel" hidden>
+      <label>
+        <span>Button label</span>
+        <select id="labelMode">
+          <option value="nameAndState">Name and state</option>
+          <option value="nameAndValue">Name and value</option>
+          <option value="stateOnly">State only</option>
+          <option value="valueOnly">Value only</option>
+          <option value="nameOnly">Name only</option>
+          <option value="hidden">No label</option>
+        </select>
+      </label>
+      <label class="check-row">
+        <input id="showConfirmation" type="checkbox" checked>
+        <span>Show success confirmation after a command</span>
+      </label>
+    </div>
+
+    <div id="switchTestPanel" hidden>
+      <button id="testSwitchButton" class="secondary" type="button">Test selected switch</button>
+      <p class="hint">Runs the same toggle operation as pressing the physical OpenDeck key.</p>
+    </div>
+
+    <div id="brightnessPanel" hidden>
+      <h3>Brightness behaviour</h3>
+      <label>
+        <span>Key or encoder-press mode</span>
+        <select id="brightnessMode">
+          <option value="increase">Increase</option>
+          <option value="decrease">Decrease</option>
+          <option value="set">Set a fixed value</option>
+          <option value="cycle">Cycle preset values</option>
+        </select>
+      </label>
+      <div class="inline">
+        <label>
+          <span>Increment</span>
+          <input id="brightnessIncrement" type="number" min="0.1" max="100" step="0.1" value="10">
+        </label>
+        <label id="brightnessTargetLabel">
+          <span>Fixed value</span>
+          <input id="brightnessTarget" type="number" min="0" max="100" step="1" value="50">
+        </label>
+      </div>
+      <label id="brightnessCycleLabel">
+        <span>Cycle values</span>
+        <input id="brightnessCycleValues" type="text" value="25, 50, 75, 100" placeholder="25, 50, 75, 100">
+      </label>
+      <label class="check-row">
+        <input id="brightnessWrap" type="checkbox" checked>
+        <span>Wrap to the first value after the final preset</span>
+      </label>
+      <label class="check-row">
+        <input id="brightnessTurnOn" type="checkbox" checked>
+        <span>Turn the light on when brightness is raised above minimum</span>
+      </label>
+      <button id="testBrightnessButton" class="secondary" type="button">Test brightness action</button>
+      <p class="hint">Rotating an encoder always adjusts brightness relatively. A key press or encoder press uses the selected mode.</p>
+    </div>
+
+    <div id="targetPanel" hidden>
+      <label id="targetInputLabel">
+        <span>Target value</span>
+        <input id="targetInput" type="text">
+      </label>
+      <label id="targetSelectLabel" hidden>
+        <span>Target value</span>
+        <select id="targetSelect"></select>
+      </label>
+      <p id="valuePreview" class="value-preview"></p>
+    </div>
+
+    <div id="speedPanel" hidden>
+      <label>
+        <span>Encoder speed multiplier</span>
+        <input id="speed" type="number" min="0.01" step="0.25" value="1">
+      </label>
+      <p class="hint">Each encoder tick changes the value by Homebridge's minimum step multiplied by this number.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="status-row">
+      <h2 id="resultsTitle">Connection status</h2>
+      <span id="statusBadge" class="badge idle">Not connected</span>
+    </div>
+    <p id="summary" class="summary">Enter the Homebridge UI address and connect.</p>
+    <p id="error" class="error" hidden></p>
+    <dl id="diagnostics" class="diagnostics" hidden>
+      <div><dt>Authentication</dt><dd id="authMethod">—</dd></div>
+      <div><dt>Token refresh</dt><dd id="tokenRefresh">—</dd></div>
+      <div><dt>Device catalogue</dt><dd id="catalogStatus">—</dd></div>
+      <div><dt>Last refreshed</dt><dd id="catalogRefreshed">—</dd></div>
+    </dl>
+    <div id="deviceList" class="device-list"></div>
+  </section>
+
+  <section class="panel help">
+    <h2>Homebridge requirement</h2>
+    <p>Homebridge Config UI must be reachable, and Homebridge must run in insecure mode (<code>-I</code>) so the UI accessory-control API can read and write characteristics. Keep port <code>8581</code> on a trusted network.</p>
+  </section>
+</main>
+
+<script src="openhome.js"></script>
+</body>
+</html>
