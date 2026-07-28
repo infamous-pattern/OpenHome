@@ -41,7 +41,6 @@ fn default_switch_label_mode() -> String {
     "nameAndState".to_string()
 }
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct SwitchSettings {
@@ -350,9 +349,11 @@ impl AccessoryService {
         characteristic_type: &str,
     ) -> Option<&Characteristic> {
         if !characteristic_uuid.trim().is_empty() {
-            if let Some(characteristic) = self.service_characteristics.iter().find(|item| {
-                item.uuid.eq_ignore_ascii_case(characteristic_uuid.trim())
-            }) {
+            if let Some(characteristic) = self
+                .service_characteristics
+                .iter()
+                .find(|item| item.uuid.eq_ignore_ascii_case(characteristic_uuid.trim()))
+            {
                 return Some(characteristic);
             }
         }
@@ -411,7 +412,12 @@ impl DeviceMetadata {
             model: first_string(value, &["Model", "model"]),
             serial_number: first_string(
                 value,
-                &["Serial Number", "SerialNumber", "serialNumber", "serial_number"],
+                &[
+                    "Serial Number",
+                    "SerialNumber",
+                    "serialNumber",
+                    "serial_number",
+                ],
             ),
             firmware_revision: first_string(
                 value,

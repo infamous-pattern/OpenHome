@@ -3,9 +3,7 @@ use std::sync::Arc;
 use openaction::{Action, ActionUuid, Instance, OpenActionResult, open_url};
 use serde_json::Value;
 
-use crate::actions::common::{
-    action_error, apply_global_settings, parse_request, send_catalog,
-};
+use crate::actions::common::{action_error, apply_global_settings, parse_request, send_catalog};
 use crate::homebridge::normalise_base_url;
 use crate::models::EmptySettings;
 use crate::state::PluginState;

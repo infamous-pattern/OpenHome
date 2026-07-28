@@ -36,10 +36,7 @@ impl GlobalEventHandler for HomebridgeGlobalEventHandler {
         Ok(())
     }
 
-    async fn system_did_wake_up(
-        &self,
-        _event: SystemDidWakeUpEvent,
-    ) -> OpenActionResult<()> {
+    async fn system_did_wake_up(&self, _event: SystemDidWakeUpEvent) -> OpenActionResult<()> {
         self.state.client.clear_all_caches().await;
         Ok(())
     }

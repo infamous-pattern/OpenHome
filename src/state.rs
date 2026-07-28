@@ -4,9 +4,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use crate::homebridge::HomebridgeClient;
-use crate::models::{
-    AdjustStateSettings, BrightnessSettings, GlobalSettings, SwitchSettings,
-};
+use crate::models::{AdjustStateSettings, BrightnessSettings, GlobalSettings, SwitchSettings};
 
 pub struct PluginState {
     pub client: HomebridgeClient,
@@ -52,7 +50,10 @@ impl PluginState {
 
     pub async fn remember_switch(&self, instance_id: String, settings: SwitchSettings) {
         self.invalid_switches.write().await.remove(&instance_id);
-        self.switch_settings.write().await.insert(instance_id, settings);
+        self.switch_settings
+            .write()
+            .await
+            .insert(instance_id, settings);
     }
 
     pub async fn forget_switch(&self, instance_id: &str) {
@@ -79,11 +80,7 @@ impl PluginState {
         !self.invalid_switches.read().await.contains(instance_id)
     }
 
-    pub async fn remember_brightness(
-        &self,
-        instance_id: String,
-        settings: BrightnessSettings,
-    ) {
+    pub async fn remember_brightness(&self, instance_id: String, settings: BrightnessSettings) {
         self.invalid_brightness.write().await.remove(&instance_id);
         self.brightness_settings
             .write()

@@ -8,9 +8,7 @@ use serde_json::{Number, Value};
 use crate::actions::common::{
     apply_global_settings, display_title, parse_request, send_catalog, send_status,
 };
-use crate::models::{
-    AccessoryService, BrightnessSettings, Characteristic, SelectedCharacteristic,
-};
+use crate::models::{AccessoryService, BrightnessSettings, Characteristic, SelectedCharacteristic};
 use crate::state::PluginState;
 
 pub const BRIGHTNESS_UUID: ActionUuid = "com.infamous-pattern.openhomeb.brightness";
@@ -106,11 +104,9 @@ impl BrightnessAction {
             .await?;
 
         if settings.turn_on_when_adjusting && requested > minimum {
-            if let Some(power) = service
-                .service_characteristics
-                .iter()
-                .find(|item| item.characteristic_type.eq_ignore_ascii_case("On") && item.is_switch_compatible())
-            {
+            if let Some(power) = service.service_characteristics.iter().find(|item| {
+                item.characteristic_type.eq_ignore_ascii_case("On") && item.is_switch_compatible()
+            }) {
                 if !read_boolean(&power.value).unwrap_or(false) {
                     self.state
                         .client
@@ -254,9 +250,7 @@ pub async fn refresh_brightness_instance(
 
     match query_brightness_state(state, settings).await {
         Ok(display) => {
-            state
-                .clear_brightness_invalid(&instance.instance_id)
-                .await;
+            state.clear_brightness_invalid(&instance.instance_id).await;
             state.clear_error(&brightness_error_key(instance)).await;
             apply_brightness_display(instance, settings, &display).await
         }
@@ -469,7 +463,9 @@ impl Action for BrightnessAction {
         ticks: i16,
         _pressed: bool,
     ) -> OpenActionResult<()> {
-        self.adjust_by_ticks(instance, settings, ticks).await.map(|_| ())
+        self.adjust_by_ticks(instance, settings, ticks)
+            .await
+            .map(|_| ())
     }
 
     async fn dial_down(
@@ -497,15 +493,7 @@ impl Action for BrightnessAction {
         settings: &Self::Settings,
     ) -> OpenActionResult<()> {
         let global = self.state.global_settings().await;
-        send_catalog(
-            instance,
-            &self.state,
-            &global,
-            None,
-            "brightness",
-            false,
-        )
-        .await?;
+        send_catalog(instance, &self.state, &global, None, "brightness", false).await?;
         refresh_brightness_instance(&self.state, instance, settings, false).await
     }
 
@@ -568,9 +556,18 @@ mod tests {
 
     #[test]
     fn cycles_and_wraps_brightness_values() {
-        assert_eq!(next_cycle_value(50.0, &[25.0, 50.0, 75.0], 0.0, 100.0, true), 75.0);
-        assert_eq!(next_cycle_value(75.0, &[25.0, 50.0, 75.0], 0.0, 100.0, true), 25.0);
-        assert_eq!(next_cycle_value(75.0, &[25.0, 50.0, 75.0], 0.0, 100.0, false), 75.0);
+        assert_eq!(
+            next_cycle_value(50.0, &[25.0, 50.0, 75.0], 0.0, 100.0, true),
+            75.0
+        );
+        assert_eq!(
+            next_cycle_value(75.0, &[25.0, 50.0, 75.0], 0.0, 100.0, true),
+            25.0
+        );
+        assert_eq!(
+            next_cycle_value(75.0, &[25.0, 50.0, 75.0], 0.0, 100.0, false),
+            75.0
+        );
     }
 
     #[test]

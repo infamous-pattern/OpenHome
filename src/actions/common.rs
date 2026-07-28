@@ -15,11 +15,7 @@ struct StatusMessage<'a> {
     message: &'a str,
 }
 
-pub async fn send_status(
-    instance: &Instance,
-    status: &str,
-    message: &str,
-) -> OpenActionResult<()> {
+pub async fn send_status(instance: &Instance, status: &str, message: &str) -> OpenActionResult<()> {
     instance
         .send_to_property_inspector(StatusMessage {
             event: "status",

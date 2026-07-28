@@ -41,7 +41,10 @@ pub fn spawn_state_poller(state: Arc<PluginState>) {
                 if let Err(error) =
                     refresh_adjust_instance(&state, &instance, &settings, false).await
                 {
-                    log::warn!("Could not refresh encoder {}: {error}", instance.instance_id);
+                    log::warn!(
+                        "Could not refresh encoder {}: {error}",
+                        instance.instance_id
+                    );
                 }
             }
 

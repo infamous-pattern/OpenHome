@@ -5,9 +5,7 @@ use anyhow::{Result, bail};
 use openaction::{Action, ActionUuid, Instance, OpenActionResult};
 use serde_json::Value;
 
-use crate::actions::common::{
-    apply_global_settings, display_title, parse_request, send_catalog,
-};
+use crate::actions::common::{apply_global_settings, display_title, parse_request, send_catalog};
 use crate::models::{AccessoryService, Characteristic, SelectedCharacteristic, SwitchSettings};
 use crate::state::PluginState;
 
@@ -140,7 +138,10 @@ impl Display for SwitchSelectionError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::CharacteristicUnavailable(detail) => {
-                write!(formatter, "selected characteristic is no longer available; {detail}")
+                write!(
+                    formatter,
+                    "selected characteristic is no longer available; {detail}"
+                )
             }
             Self::CannotRead => write!(formatter, "selected characteristic cannot be read"),
             Self::ReadOnly => write!(formatter, "selected characteristic is read-only"),
@@ -212,7 +213,9 @@ async fn apply_display_state(
     instance: &Instance,
     display: &SwitchDisplayState,
 ) -> OpenActionResult<()> {
-    instance.set_state(if display.is_on { 1 } else { 0 }).await?;
+    instance
+        .set_state(if display.is_on { 1 } else { 0 })
+        .await?;
     instance.set_title(Some(display.title.clone()), None).await
 }
 
@@ -235,10 +238,7 @@ pub async fn refresh_switch_instance(
     }
 }
 
-async fn set_not_configured(
-    state: &Arc<PluginState>,
-    instance: &Instance,
-) -> OpenActionResult<()> {
+async fn set_not_configured(state: &Arc<PluginState>, instance: &Instance) -> OpenActionResult<()> {
     state.mark_switch_invalid(&instance.instance_id).await;
     state.clear_error(&switch_error_key(instance)).await;
     instance.set_title(Some("Not\nConfigured"), None).await
@@ -398,7 +398,10 @@ impl Action for SwitchAction {
             .await;
 
         if request.event == "toggleSwitch" {
-            log::info!("Switch {}: property-inspector test toggle requested", instance.instance_id);
+            log::info!(
+                "Switch {}: property-inspector test toggle requested",
+                instance.instance_id
+            );
             let changed = self.toggle(instance, &settings).await?;
             let message = if changed {
                 "Switch state changed and confirmed by Homebridge"
@@ -443,7 +446,10 @@ mod tests {
 
     #[test]
     fn title_contains_current_state() {
-        assert_eq!(state_title("Desk Lamp", true, "nameAndState"), "Desk Lamp\nOn");
+        assert_eq!(
+            state_title("Desk Lamp", true, "nameAndState"),
+            "Desk Lamp\nOn"
+        );
         assert_eq!(state_title("Desk Lamp", false, "stateOnly"), "Off");
         assert_eq!(state_title("Desk Lamp", true, "hidden"), "");
     }

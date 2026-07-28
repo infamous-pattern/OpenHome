@@ -27,9 +27,8 @@ async fn main() -> OpenActionResult<()> {
         eprintln!("Logger initialisation failed: {error}");
     }
 
-    let state = PluginState::new().unwrap_or_else(|error| {
-        panic!("Unable to initialise the OpenHomeB plugin: {error}")
-    });
+    let state = PluginState::new()
+        .unwrap_or_else(|error| panic!("Unable to initialise the OpenHomeB plugin: {error}"));
 
     let global_handler = Box::leak(Box::new(HomebridgeGlobalEventHandler::new(state.clone())));
     set_global_event_handler(global_handler);

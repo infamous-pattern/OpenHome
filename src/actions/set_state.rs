@@ -27,7 +27,13 @@ impl SetStateAction {
         settings: &SetStateSettings,
     ) -> OpenActionResult<()> {
         if !settings.is_configured() || settings.target_value.is_null() {
-            return action_error(instance, "Select\nstate", "set-state action is not configured", true).await;
+            return action_error(
+                instance,
+                "Select\nstate",
+                "set-state action is not configured",
+                true,
+            )
+            .await;
         }
 
         let global = self.state.global_settings().await;
@@ -109,11 +115,7 @@ impl Action for SetStateAction {
         self.update_title(instance, settings).await
     }
 
-    async fn key_up(
-        &self,
-        instance: &Instance,
-        settings: &Self::Settings,
-    ) -> OpenActionResult<()> {
+    async fn key_up(&self, instance: &Instance, settings: &Self::Settings) -> OpenActionResult<()> {
         self.apply(instance, settings).await
     }
 

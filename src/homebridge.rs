@@ -157,11 +157,7 @@ impl HomebridgeClient {
         }
     }
 
-    async fn fetch_catalog(
-        &self,
-        settings: &GlobalSettings,
-        otp: Option<&str>,
-    ) -> Result<Catalog> {
+    async fn fetch_catalog(&self, settings: &GlobalSettings, otp: Option<&str>) -> Result<Catalog> {
         let (mut services, authentication, authentication_status) =
             self.list_accessories(settings, otp).await?;
         let layout = self.list_layout(settings, otp).await.unwrap_or_default();
@@ -240,8 +236,9 @@ impl HomebridgeClient {
         settings: &GlobalSettings,
         otp: Option<&str>,
     ) -> Result<(Vec<AccessoryService>, String, AuthenticationStatus)> {
-        let (value, token): (Value, CachedToken) =
-            self.authorized_get(settings, otp, "/api/accessories").await?;
+        let (value, token): (Value, CachedToken) = self
+            .authorized_get(settings, otp, "/api/accessories")
+            .await?;
         let services = parse_accessory_services(value)?;
         Ok((services, token.authentication.clone(), token.status()))
     }
@@ -436,10 +433,7 @@ impl HomebridgeClient {
         if no_auth_response.status().is_success() {
             let response: TokenResponse =
                 decode_response(no_auth_response, &no_auth_endpoint).await?;
-            return Ok(cached_token(
-                response,
-                "Homebridge authentication disabled",
-            ));
+            return Ok(cached_token(response, "Homebridge authentication disabled"));
         }
 
         if settings.username.trim().is_empty() || settings.password.is_empty() {
@@ -472,11 +466,7 @@ impl HomebridgeClient {
     }
 }
 
-fn decorate_cached_catalog(
-    cached: CachedCatalog,
-    stale: bool,
-    warning: Option<String>,
-) -> Catalog {
+fn decorate_cached_catalog(cached: CachedCatalog, stale: bool, warning: Option<String>) -> Catalog {
     let mut catalog = cached.catalog;
     catalog.cache_age_seconds = cached.fetched_at.elapsed().as_secs();
     catalog.cached = true;
@@ -526,9 +516,7 @@ async fn decode_response<T: DeserializeOwned>(
         if status == StatusCode::BAD_REQUEST
             && detail.to_ascii_lowercase().contains("insecure mode")
         {
-            bail!(
-                "Homebridge must run in insecure mode (-I) before accessories can be controlled"
-            )
+            bail!("Homebridge must run in insecure mode (-I) before accessories can be controlled")
         }
         bail!("Homebridge returned HTTP {status} from {endpoint}: {detail}")
     }
@@ -634,7 +622,10 @@ fn normalise_service_value(value: Value) -> Result<Value> {
     Ok(Value::Object(object))
 }
 
-fn characteristics_from_values(values: &Map<String, Value>, service: &Map<String, Value>) -> Vec<Value> {
+fn characteristics_from_values(
+    values: &Map<String, Value>,
+    service: &Map<String, Value>,
+) -> Vec<Value> {
     let explicitly_writable = service
         .get("writableCharacteristics")
         .and_then(Value::as_array)
@@ -777,15 +768,10 @@ fn accessory_path(unique_id: &str) -> String {
 pub fn normalise_base_url(input: &str) -> Result<String> {
     let mut value = input.trim().trim_end_matches('/').to_string();
     if value.is_empty() {
-        bail!(
-            "enter the Homebridge UI address, for example http://homebridge.local:8581"
-        )
+        bail!("enter the Homebridge UI address, for example http://homebridge.local:8581")
     }
 
-    if value.contains("://")
-        && !value.starts_with("http://")
-        && !value.starts_with("https://")
-    {
+    if value.contains("://") && !value.starts_with("http://") && !value.starts_with("https://") {
         bail!("Homebridge URL must use http:// or https://")
     }
     if !value.starts_with("http://") && !value.starts_with("https://") {

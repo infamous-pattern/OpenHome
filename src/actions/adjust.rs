@@ -28,7 +28,13 @@ impl AdjustStateAction {
         ticks: i16,
     ) -> OpenActionResult<()> {
         if !settings.is_configured() {
-            return action_error(instance, "Select\nstate", "adjust action is not configured", true).await;
+            return action_error(
+                instance,
+                "Select\nstate",
+                "adjust action is not configured",
+                true,
+            )
+            .await;
         }
 
         let global = self.state.global_settings().await;
@@ -215,7 +221,10 @@ fn format_value(value: &Value) -> String {
         if number.fract().abs() < 0.000_001 {
             return format!("{number:.0}");
         }
-        return format!("{number:.2}").trim_end_matches('0').trim_end_matches('.').to_string();
+        return format!("{number:.2}")
+            .trim_end_matches('0')
+            .trim_end_matches('.')
+            .to_string();
     }
     if let Some(text) = value.as_str() {
         return text.to_string();
@@ -335,8 +344,17 @@ mod tests {
 
     #[test]
     fn calculates_encoder_indicator_percentage() {
-        assert_eq!(indicator_percentage(&json!(50), Some(0.0), Some(100.0)), 50.0);
-        assert_eq!(indicator_percentage(&json!(125), Some(0.0), Some(100.0)), 100.0);
-        assert_eq!(indicator_percentage(&json!(-10), Some(0.0), Some(100.0)), 0.0);
+        assert_eq!(
+            indicator_percentage(&json!(50), Some(0.0), Some(100.0)),
+            50.0
+        );
+        assert_eq!(
+            indicator_percentage(&json!(125), Some(0.0), Some(100.0)),
+            100.0
+        );
+        assert_eq!(
+            indicator_percentage(&json!(-10), Some(0.0), Some(100.0)),
+            0.0
+        );
     }
 }
