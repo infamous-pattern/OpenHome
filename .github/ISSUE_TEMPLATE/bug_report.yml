@@ -1,57 +1,165 @@
 name: Bug report
-description: Report a reproducible problem with the OpenHomeB plugin
+description: Report a reproducible problem with OpenHomeB
 title: "[Bug]: "
-labels: [bug]
+labels:
+  - bug
+  - needs-triage
 body:
   - type: markdown
     attributes:
-      value: Thanks for helping improve the plugin. Remove passwords, tokens, and private hostnames from logs before attaching them.
-  - type: input
-    id: version
-    attributes:
-      label: Plugin version
-      placeholder: 2.0.1
-    validations:
-      required: true
-  - type: input
-    id: opendeck
-    attributes:
-      label: OpenDeck version
-    validations:
-      required: true
-  - type: input
-    id: homebridge
-    attributes:
-      label: Homebridge and Config UI versions
-      placeholder: Homebridge 2.2.1, Config UI x.x.x
-    validations:
-      required: true
+      value: |
+        Thanks for helping improve OpenHomeB.
+
+        Please provide enough detail to reproduce the problem. Do not include passwords,
+        Homebridge access tokens, two-factor codes, private URLs, or other secrets.
+
   - type: dropdown
-    id: architecture
+    id: action
     attributes:
-      label: Linux architecture
+      label: Affected OpenHomeB action
+      description: Which action or area is experiencing the problem?
       options:
-        - x86_64
-        - aarch64
+        - Homebridge Devices
+        - Switch
+        - Set State
+        - Adjust State
+        - Brightness
+        - Open Homebridge UI
+        - Authentication or connection
+        - Installation or packaging
         - Other
     validations:
       required: true
-  - type: textarea
-    id: steps
+
+  - type: input
+    id: openhomeb_version
     attributes:
-      label: Steps to reproduce
-      placeholder: Describe the action, selected service/characteristic, and what happened.
+      label: OpenHomeB version
+      description: Enter the installed plugin version.
+      placeholder: "2.0.1"
     validations:
       required: true
+
+  - type: input
+    id: opendeck_version
+    attributes:
+      label: OpenDeck version
+      placeholder: "Example: 2.x.x"
+    validations:
+      required: true
+
+  - type: input
+    id: homebridge_version
+    attributes:
+      label: Homebridge version
+      placeholder: "Example: 2.2.1"
+    validations:
+      required: true
+
+  - type: input
+    id: config_ui_version
+    attributes:
+      label: Homebridge Config UI version
+      description: This is shown in the Homebridge UI system information.
+      placeholder: "Example: 5.x.x"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: operating_system
+    attributes:
+      label: Operating system
+      options:
+        - Fedora Workstation 44
+        - Other Fedora version
+        - Another Linux distribution
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: architecture
+    attributes:
+      label: System architecture
+      placeholder: "Example: x86_64 or aarch64"
+    validations:
+      required: true
+
+  - type: input
+    id: homebridge_plugin
+    attributes:
+      label: Homebridge accessory plugin
+      description: Name and version of the Homebridge plugin that exposes the affected device.
+      placeholder: "Example: homebridge-hue 0.x.x"
+    validations:
+      required: false
+
+  - type: input
+    id: device
+    attributes:
+      label: Device or service
+      description: Include the device type, manufacturer, model, and Homebridge service when known.
+      placeholder: "Example: Philips Hue bulb, Lightbulb service, On characteristic"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest reliable sequence that triggers the problem.
+      placeholder: |
+        1. Add the Switch action to an OpenDeck key.
+        2. Select the Living Room Lamp service.
+        3. Select the On characteristic.
+        4. Press the key.
+        5. Observe that the device state does not change.
+    validations:
+      required: true
+
   - type: textarea
     id: expected
     attributes:
       label: Expected behaviour
+      placeholder: Describe what you expected OpenHomeB to do.
     validations:
       required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      placeholder: Describe what happened instead, including any visible error.
+    validations:
+      required: true
+
   - type: textarea
     id: logs
     attributes:
-      label: Relevant plugin log lines
-      description: Remove credentials, tokens, public hostnames, and IP addresses you do not want shared.
-      render: text
+      label: Relevant logs
+      description: |
+        Paste only the entries produced immediately before and after the problem.
+        Redact passwords, tokens, private hostnames, public IP addresses, and other secrets.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add screenshots, configuration details, or anything else that may help.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I tested with the latest available OpenHomeB release.
+          required: true
+        - label: I removed passwords, tokens, private addresses, and other secrets.
+          required: true

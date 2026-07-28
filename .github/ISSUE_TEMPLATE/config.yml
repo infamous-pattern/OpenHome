@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Homebridge support
+    url: https://github.com/homebridge/homebridge/issues
+    about: Use this for problems that also occur without OpenHomeB.
+  - name: OpenDeck support
+    url: https://github.com/nekename/OpenDeck/issues
+    about: Use this for general OpenDeck problems unrelated to OpenHomeB.
