@@ -12,7 +12,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
@@ -181,6 +181,8 @@ jobs:
           if-no-files-found: error
 
   publish:
+    permissions:
+      contents: write
     needs: package
     runs-on: ubuntu-latest
     steps:
