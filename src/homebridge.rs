@@ -85,7 +85,7 @@ impl HomebridgeClient {
         let client = Client::builder()
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(20))
-            .user_agent("OpenHomeB/2.0.1")
+            .user_agent("OpenHomeB/2.0.2")
             .build()
             .context("could not create the Homebridge HTTP client")?;
 
@@ -129,17 +129,8 @@ impl HomebridgeClient {
             }
         }
 
-        match self.fetch_catalog(settings, otp).await {
-            Ok(catalog) => {
-                self.catalogs.write().await.insert(
-                    key,
-                    CachedCatalog {
-                        catalog: catalog.clone(),
-                        fetched_at: Instant::now(),
-                    },
-                );
-                Ok(catalog)
-            }
+        match self.refresh_catalog_live(settings, otp).await {
+            Ok(catalog) => Ok(catalog),
             Err(error) => {
                 if let Some(cached) = self.catalogs.read().await.get(&key).cloned() {
                     log::warn!(
@@ -155,6 +146,27 @@ impl HomebridgeClient {
                 }
             }
         }
+    }
+
+    /// Refreshes the Homebridge catalogue from the live API and never falls back to stale data.
+    /// This is used by the reconnect monitor so an old cache cannot be mistaken for a healthy
+    /// Homebridge connection.
+    pub async fn refresh_catalog_live(
+        &self,
+        settings: &GlobalSettings,
+        otp: Option<&str>,
+    ) -> Result<Catalog> {
+        let base_url = normalise_base_url(&settings.homebridge_url)?;
+        let key = credential_key(&base_url, settings);
+        let catalog = self.fetch_catalog(settings, otp).await?;
+        self.catalogs.write().await.insert(
+            key,
+            CachedCatalog {
+                catalog: catalog.clone(),
+                fetched_at: Instant::now(),
+            },
+        );
+        Ok(catalog)
     }
 
     async fn fetch_catalog(&self, settings: &GlobalSettings, otp: Option<&str>) -> Result<Catalog> {

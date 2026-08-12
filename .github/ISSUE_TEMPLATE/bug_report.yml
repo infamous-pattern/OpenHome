@@ -36,7 +36,7 @@ body:
     attributes:
       label: OpenHomeB version
       description: Enter the installed plugin version.
-      placeholder: "2.0.1"
+      placeholder: "2.0.2"
     validations:
       required: true
 

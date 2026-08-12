@@ -38,6 +38,9 @@ impl GlobalEventHandler for HomebridgeGlobalEventHandler {
 
     async fn system_did_wake_up(&self, _event: SystemDidWakeUpEvent) -> OpenActionResult<()> {
         self.state.client.clear_all_caches().await;
+        self.state.mark_connection_offline();
+        self.state.request_reconnect();
+        log::info!("OpenHomeB wake: Homebridge reconnect requested");
         Ok(())
     }
 }

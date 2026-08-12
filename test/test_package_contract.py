@@ -24,7 +24,7 @@ class PackageContractTests(unittest.TestCase):
         self.assertEqual(manifest["Name"], "OpenHomeB")
         self.assertEqual(manifest["Category"], "OpenHomeB")
         self.assertEqual(manifest["Author"], "Infamous Pattern")
-        self.assertEqual(manifest["Version"], "2.0.1")
+        self.assertEqual(manifest["Version"], "2.0.2")
         self.assertEqual(manifest["OS"], [{"Platform": "linux"}])
         self.assertIn("x86_64-unknown-linux-gnu", manifest["CodePaths"])
         self.assertIn("aarch64-unknown-linux-gnu", manifest["CodePaths"])
@@ -183,19 +183,35 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("function characteristicKey", inspector)
         self.assertIn("characteristicUuid", inspector)
 
-    def test_version_2_0_1_is_consistent_across_release_metadata(self):
+    def test_version_2_0_2_is_consistent_across_release_metadata(self):
         cargo = (ROOT / "Cargo.toml").read_text()
         manifest = json.loads((ROOT / "assets" / "manifest.json").read_text())
         homebridge = (ROOT / "src" / "homebridge.rs").read_text()
         release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
 
-        self.assertIn('version = "2.0.1"', cargo)
-        self.assertEqual(manifest["Version"], "2.0.1")
-        self.assertIn('OpenHomeB/2.0.1', homebridge)
-        self.assertTrue((ROOT / "RELEASE_NOTES_2.0.1.md").is_file())
+        self.assertIn('version = "2.0.2"', cargo)
+        self.assertEqual(manifest["Version"], "2.0.2")
+        self.assertIn('OpenHomeB/2.0.2', homebridge)
+        self.assertTrue((ROOT / "RELEASE_NOTES_2.0.2.md").is_file())
         self.assertNotIn("RELEASE_NOTES_2.0.0.md", release_workflow)
         self.assertIn('RELEASE_NOTES_${version}.md', release_workflow)
 
+
+    def test_startup_reconnect_monitor_recovers_and_refreshes_visible_actions(self):
+        poller = (ROOT / "src" / "poller.rs").read_text()
+        state = (ROOT / "src" / "state.rs").read_text()
+        homebridge = (ROOT / "src" / "homebridge.rs").read_text()
+
+        self.assertIn("spawn_reconnect_monitor", poller)
+        self.assertIn("STARTUP_GRACE_SECONDS", poller)
+        self.assertIn("[2, 5, 10, 30, 60]", poller)
+        self.assertIn("HEALTH_CHECK_SECONDS", poller)
+        self.assertIn("refresh_visible_actions", poller)
+        self.assertIn("global_settings_loaded", state)
+        self.assertIn("connection_online", state)
+        self.assertIn("request_reconnect", state)
+        self.assertIn("refresh_catalog_live", homebridge)
+        self.assertIn("never falls back to stale data", homebridge)
 
     def test_openhomeb_branding_replaces_former_project_namespace(self):
         cargo = (ROOT / "Cargo.toml").read_text()

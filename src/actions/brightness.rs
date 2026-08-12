@@ -6,7 +6,8 @@ use openaction::{Action, ActionUuid, Instance, OpenActionResult, send_arbitrary_
 use serde_json::{Number, Value};
 
 use crate::actions::common::{
-    apply_global_settings, display_title, parse_request, send_catalog, send_status,
+    apply_global_settings, display_title, looks_like_connection_error, parse_request, send_catalog,
+    send_status,
 };
 use crate::models::{AccessoryService, BrightnessSettings, Characteristic, SelectedCharacteristic};
 use crate::state::PluginState;
@@ -60,6 +61,7 @@ impl BrightnessAction {
             .client
             .get_accessory(&global, None, settings.accessory_id())
             .await?;
+        self.state.mark_connection_online();
         let characteristic = selected_brightness_characteristic(&service, settings)?;
         let current = characteristic
             .value
@@ -188,6 +190,7 @@ async fn query_brightness_state(
         .client
         .get_accessory(&global, None, settings.accessory_id())
         .await?;
+    state.mark_connection_online();
     let characteristic = selected_brightness_characteristic(&service, settings)?;
     let value = characteristic
         .value
@@ -303,8 +306,16 @@ async fn report_brightness_error(
     if message.contains("not configured") || message.contains("no longer available") {
         state.mark_brightness_invalid(&instance.instance_id).await;
         instance.set_title(Some("Not\nConfigured"), None).await?;
+    } else if looks_like_connection_error(&message) {
+        state.mark_connection_offline();
+        state.request_reconnect();
+        if show_alert {
+            instance.set_title(Some("Offline"), None).await?;
+        } else if !state.has_connected_once() {
+            instance.set_title(Some("Connecting…"), None).await?;
+        }
     } else {
-        instance.set_title(Some("Offline"), None).await?;
+        instance.set_title(Some("Homebridge\nerror"), None).await?;
     }
     if show_alert {
         instance.show_alert().await?;
@@ -433,6 +444,15 @@ impl Action for BrightnessAction {
         self.state
             .remember_brightness(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return refresh_brightness_instance(&self.state, instance, settings, false).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            return Ok(());
+        }
         refresh_brightness_instance(&self.state, instance, settings, false).await
     }
 
@@ -484,6 +504,16 @@ impl Action for BrightnessAction {
         self.state
             .remember_brightness(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return refresh_brightness_instance(&self.state, instance, settings, false).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            self.state.request_reconnect();
+            return Ok(());
+        }
         refresh_brightness_instance(&self.state, instance, settings, false).await
     }
 

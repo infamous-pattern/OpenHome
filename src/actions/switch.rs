@@ -5,7 +5,9 @@ use anyhow::{Result, bail};
 use openaction::{Action, ActionUuid, Instance, OpenActionResult};
 use serde_json::Value;
 
-use crate::actions::common::{apply_global_settings, display_title, parse_request, send_catalog};
+use crate::actions::common::{
+    apply_global_settings, display_title, looks_like_connection_error, parse_request, send_catalog,
+};
 use crate::models::{AccessoryService, Characteristic, SelectedCharacteristic, SwitchSettings};
 use crate::state::PluginState;
 
@@ -167,6 +169,7 @@ async fn query_display_state(
         .client
         .get_accessory(&global, None, &settings.accessory_id)
         .await?;
+    state.mark_connection_online();
     let characteristic = selected_switch_characteristic(&service, settings)?;
     let is_on = boolean_state(&characteristic.value)?;
     let name = display_title(&settings.display_name, &service.service_name);
@@ -259,11 +262,23 @@ async fn report_switch_error(
 
     let title = if error.downcast_ref::<SwitchSelectionError>().is_some() {
         state.mark_switch_invalid(&instance.instance_id).await;
-        "Not\nConfigured"
+        Some("Not\nConfigured")
+    } else if looks_like_connection_error(&message) {
+        state.mark_connection_offline();
+        state.request_reconnect();
+        if show_alert {
+            Some("Offline")
+        } else if state.has_connected_once() {
+            None
+        } else {
+            Some("Connecting…")
+        }
     } else {
-        "Offline"
+        Some("Homebridge\nerror")
     };
-    instance.set_title(Some(title), None).await?;
+    if let Some(title) = title {
+        instance.set_title(Some(title), None).await?;
+    }
     if show_alert {
         instance.show_alert().await?;
     }
@@ -327,6 +342,15 @@ impl Action for SwitchAction {
         self.state
             .remember_switch(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return set_not_configured(&self.state, instance).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            return Ok(());
+        }
         refresh_switch_instance(&self.state, instance, settings, false).await
     }
 
@@ -359,6 +383,16 @@ impl Action for SwitchAction {
         self.state
             .remember_switch(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return set_not_configured(&self.state, instance).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            self.state.request_reconnect();
+            return Ok(());
+        }
         refresh_switch_instance(&self.state, instance, settings, false).await
     }
 

@@ -2,7 +2,7 @@
 
 A Linux-native OpenDeck/OpenAction plugin for discovering and controlling accessories exposed by Homebridge Config UI.
 
-**Current version: 2.0.1**
+**Current version: 2.0.2**
 
 ![OpenHomeB overview](docs/screenshots/overview.png)
 
@@ -17,7 +17,7 @@ A Linux-native OpenDeck/OpenAction plugin for discovering and controlling access
 
 </details>
 
-Version 2.0.1 includes the complete 2.0 feature set and release-build validation fixes. Version 2.0 expanded the working Switch implementation with dedicated brightness controls, shared discovery caching, proactive authentication renewal, richer device metadata, compatibility parsing, and configurable button labels.
+Version 2.0.2 adds automatic startup and reconnect recovery so OpenHomeB refreshes itself when Fedora networking or Homebridge becomes available after OpenDeck starts. It also retains the complete 2.0 feature set: dedicated brightness controls, shared discovery caching, proactive authentication renewal, richer device metadata, compatibility parsing, and configurable button labels.
 
 ## Highlights
 
@@ -55,6 +55,13 @@ OpenHomeB uses the new plugin and action namespace `com.infamous-pattern.openhom
 1. Homebridge Config UI must be installed and reachable, normally on TCP port `8581`.
 2. Homebridge must run in insecure mode (`-I`) for the Config UI accessory-control API to read and write characteristics.
 3. Keep Homebridge and port `8581` on a trusted LAN; do not expose it directly to the internet.
+
+
+## Automatic startup and reconnect recovery
+
+OpenHomeB 2.0.2 no longer requires opening Homebridge in a browser after Fedora login. The plugin waits briefly for networking, then performs a live Homebridge catalogue refresh. If Homebridge is unavailable it retries with bounded backoff at 2, 5, 10, 30, and 60 seconds.
+
+After a successful reconnect OpenHomeB reauthenticates as needed, refreshes the shared catalogue, and updates visible Devices, Switch, Adjust State, and Brightness actions. A 60-second health check keeps recovery active after Homebridge restarts, system wake events, or temporary network outages. Background connection failures preserve the last-known control state instead of replacing it repeatedly with an Offline title.
 
 ## Build on Fedora Workstation 44
 

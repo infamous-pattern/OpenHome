@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.2 — 2026-08-12
+
+- Added automatic startup connection recovery after Fedora login.
+- Added a 3-second network-readiness grace period before the first Homebridge probe.
+- Added bounded reconnect backoff: 2, 5, 10, 30, then 60 seconds.
+- Added a 60-second live Homebridge health check that does not treat stale catalogue data as online.
+- Refreshes visible Devices, Switch, Adjust State, and Brightness actions immediately after reconnect.
+- Reconnects automatically after system wake and after connection-related action failures.
+- Preserves last-known state during background outages and suppresses repeated identical connection errors.
+
 ## 2.0.1 — 2026-07-28
 
 - Renamed the project and plugin to OpenHomeB.

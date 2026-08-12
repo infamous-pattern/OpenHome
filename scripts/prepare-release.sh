@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${1:-2.0.1}"
+VERSION="${1:-2.0.2}"
 PLUGIN_ID="com.infamous-pattern.openhomeb"
 BINARY="openhomeb"
 ASSET_DIR="${ROOT_DIR}/release-assets"
