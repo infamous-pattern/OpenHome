@@ -1,11 +1,11 @@
-# Validation status — version 2.0.1
+# Validation status — version 2.0.2
 
-Validated in the artifact-generation environment on 28 July 2026.
+Validated in the artifact-generation environment on 12 August 2026.
 
 ## Automated validation completed
 
-- OpenDeck manifest JSON syntax and version `2.0.1`.
-- Cargo package version and HTTP user agent set to `2.0.1`.
+- OpenDeck manifest JSON syntax and version `2.0.2`.
+- Cargo package version and HTTP user agent set to `2.0.2`.
 - Six action definitions, including the Keypad/Encoder **Brightness** action.
 - Linux code paths for x86_64 and aarch64.
 - Existence of every manifest icon and property-inspector asset.
@@ -18,11 +18,11 @@ Validated in the artifact-generation environment on 28 July 2026.
 
 ## Automated API and package-contract tests
 
-Twenty tests passed, covering authentication, discovery, reads, writes, brightness control, token renewal, HTTP 401 retry, catalogue caching, stale-cache fallback, UUID-first characteristic matching, compatibility parsing, metadata, action-selection reconciliation, label options, package structure, and OpenHomeB branding and publisher-neutral identifiers.
+Twenty-two tests passed, covering authentication, discovery, reads, writes, brightness control, token renewal, HTTP 401 retry, catalogue caching, stale-cache fallback, UUID-first characteristic matching, compatibility parsing, metadata, action-selection reconciliation, label options, package structure, and OpenHomeB branding and publisher-neutral identifiers.
 
 ## Rust release-validation corrections
 
-Version 2.0.1 carries forward the release-build fixes for:
+Version 2.0.2 carries forward the release-build fixes for:
 
 - unused action UUID re-exports;
 - the unused `Characteristic` import;
@@ -41,3 +41,13 @@ cargo clippy --all-targets -- -D warnings
 ```
 
 The Fedora build script performs a native release build, and the tagged GitHub Actions workflow builds x86_64 and aarch64 binaries before creating the installable universal `.streamDeckPlugin` asset.
+
+## 2.0.2 reconnect validation
+
+- Startup monitor waits for OpenDeck global settings before attempting Homebridge.
+- Initial connection uses a 3-second network grace period.
+- Retry backoff is bounded at 2/5/10/30/60 seconds.
+- Health checks use a live catalogue refresh and cannot succeed from stale cache alone.
+- Successful reconnect refreshes visible stateful actions.
+- System wake clears caches and requests a reconnect.
+- Background connection failures preserve last-known state where possible.

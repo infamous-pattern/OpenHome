@@ -7,7 +7,37 @@ use crate::actions::common::{apply_global_settings, parse_request, send_catalog}
 use crate::models::EmptySettings;
 use crate::state::PluginState;
 
-const ACTION_UUID: ActionUuid = "com.infamous-pattern.openhomeb.devices";
+pub const DEVICES_UUID: ActionUuid = "com.infamous-pattern.openhomeb.devices";
+
+pub async fn refresh_devices_instance(
+    state: &Arc<PluginState>,
+    instance: &Instance,
+) -> OpenActionResult<()> {
+    if !state.global_settings_loaded() || !state.connection_online() {
+        return Ok(());
+    }
+
+    let global = state.global_settings().await;
+    match state.client.catalog(&global, None, false).await {
+        Ok(catalog) => {
+            let title = if catalog.device_count == 1 {
+                "1\ndevice".to_string()
+            } else {
+                format!("{}\ndevices", catalog.device_count)
+            };
+            instance.set_title(Some(title), None).await
+        }
+        Err(error) => {
+            if state
+                .should_log_error("devices:background-refresh", &error.to_string())
+                .await
+            {
+                log::warn!("Could not refresh Homebridge device count: {error}");
+            }
+            Ok(())
+        }
+    }
+}
 
 pub struct HomebridgeDevicesAction {
     state: Arc<PluginState>,
@@ -27,6 +57,9 @@ impl HomebridgeDevicesAction {
         let global = self.state.global_settings().await;
         match self.state.client.catalog(&global, otp, true).await {
             Ok(catalog) => {
+                if !catalog.stale {
+                    self.state.mark_connection_online();
+                }
                 let title = if catalog.device_count == 1 {
                     "1\ndevice".to_string()
                 } else {
@@ -45,6 +78,8 @@ impl HomebridgeDevicesAction {
                     .await?;
             }
             Err(error) => {
+                self.state.mark_connection_offline();
+                self.state.request_reconnect();
                 instance.set_title(Some("Homebridge\nerror"), None).await?;
                 if button_feedback {
                     instance.show_alert().await?;
@@ -59,7 +94,7 @@ impl HomebridgeDevicesAction {
 #[openaction::async_trait]
 impl Action for HomebridgeDevicesAction {
     type Settings = EmptySettings;
-    const UUID: ActionUuid = ACTION_UUID;
+    const UUID: ActionUuid = DEVICES_UUID;
 
     async fn will_appear(
         &self,

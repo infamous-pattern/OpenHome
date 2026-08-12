@@ -2,7 +2,7 @@
   "Name": "OpenHomeB",
   "Description": "OpenHomeB controls Homebridge accessories from OpenDeck on Linux with live state, brightness, caching, and token management.",
   "Author": "Infamous Pattern",
-  "Version": "2.0.1",
+  "Version": "2.0.2",
   "CodePaths": {
     "x86_64-unknown-linux-gnu": "x86_64-unknown-linux-gnu/bin/openhomeb",
     "aarch64-unknown-linux-gnu": "aarch64-unknown-linux-gnu/bin/openhomeb"

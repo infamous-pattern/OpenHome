@@ -12,7 +12,7 @@ use actions::{
 use global_handler::HomebridgeGlobalEventHandler;
 use openaction::global_events::set_global_event_handler;
 use openaction::{OpenActionResult, register_action, run};
-use poller::spawn_state_poller;
+use poller::{spawn_reconnect_monitor, spawn_state_poller};
 use simplelog::{ColorChoice, Config, LevelFilter, TermLogger, TerminalMode};
 use state::PluginState;
 
@@ -40,6 +40,7 @@ async fn main() -> OpenActionResult<()> {
     register_action(BrightnessAction::new(state.clone())).await;
     register_action(LaunchHomebridgeUiAction::new(state.clone())).await;
 
+    spawn_reconnect_monitor(state.clone());
     spawn_state_poller(state);
     run(std::env::args().collect()).await
 }

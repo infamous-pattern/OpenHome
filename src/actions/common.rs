@@ -59,6 +59,12 @@ pub async fn send_catalog(
 
     match state.client.catalog(global, otp, force_refresh).await {
         Ok(catalog) => {
+            if !catalog.stale {
+                let reconnected = state.mark_connection_online();
+                if reconnected {
+                    log::info!("OpenHomeB property inspector: Homebridge connection restored");
+                }
+            }
             let status_message = if catalog.stale {
                 catalog
                     .warning
@@ -91,6 +97,8 @@ pub async fn send_catalog(
             .await?;
         }
         Err(error) => {
+            state.mark_connection_offline();
+            state.request_reconnect();
             send_status(instance, "error", &error.to_string()).await?;
         }
     }
@@ -128,4 +136,25 @@ pub fn display_title(configured_name: &str, fallback: &str) -> String {
     } else {
         value.to_string()
     }
+}
+
+pub fn looks_like_connection_error(message: &str) -> bool {
+    let message = message.to_ascii_lowercase();
+    [
+        "could not connect",
+        "connection refused",
+        "connection reset",
+        "timed out",
+        "timeout",
+        "dns",
+        "error sending request",
+        "authentication failed",
+        "requires authentication",
+        "401 unauthorized",
+        "502 bad gateway",
+        "503 service unavailable",
+        "504 gateway timeout",
+    ]
+    .iter()
+    .any(|needle| message.contains(needle))
 }

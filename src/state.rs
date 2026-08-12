@@ -1,7 +1,8 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, watch};
 
 use crate::homebridge::HomebridgeClient;
 use crate::models::{AdjustStateSettings, BrightnessSettings, GlobalSettings, SwitchSettings};
@@ -9,6 +10,11 @@ use crate::models::{AdjustStateSettings, BrightnessSettings, GlobalSettings, Swi
 pub struct PluginState {
     pub client: HomebridgeClient,
     global_settings: RwLock<GlobalSettings>,
+    global_settings_loaded: AtomicBool,
+    connection_online: AtomicBool,
+    connection_ever_online: AtomicBool,
+    reconnect_generation: AtomicU64,
+    reconnect_tx: watch::Sender<u64>,
     switch_settings: RwLock<HashMap<String, SwitchSettings>>,
     adjust_settings: RwLock<HashMap<String, AdjustStateSettings>>,
     brightness_settings: RwLock<HashMap<String, BrightnessSettings>>,
@@ -19,9 +25,15 @@ pub struct PluginState {
 
 impl PluginState {
     pub fn new() -> anyhow::Result<Arc<Self>> {
+        let (reconnect_tx, _) = watch::channel(0_u64);
         Ok(Arc::new(Self {
             client: HomebridgeClient::new()?,
             global_settings: RwLock::new(GlobalSettings::default()),
+            global_settings_loaded: AtomicBool::new(false),
+            connection_online: AtomicBool::new(false),
+            connection_ever_online: AtomicBool::new(false),
+            reconnect_generation: AtomicU64::new(0),
+            reconnect_tx,
             switch_settings: RwLock::new(HashMap::new()),
             adjust_settings: RwLock::new(HashMap::new()),
             brightness_settings: RwLock::new(HashMap::new()),
@@ -42,10 +54,48 @@ impl PluginState {
             || previous.password != settings.password
         {
             self.client.clear_all_caches().await;
+            self.mark_connection_offline();
         } else if previous.catalog_cache_seconds != settings.catalog_cache_seconds {
             self.client.clear_catalogs().await;
         }
         *self.global_settings.write().await = settings;
+        self.global_settings_loaded.store(true, Ordering::Release);
+        self.request_reconnect();
+    }
+
+    pub fn global_settings_loaded(&self) -> bool {
+        self.global_settings_loaded.load(Ordering::Acquire)
+    }
+
+    pub fn connection_online(&self) -> bool {
+        self.connection_online.load(Ordering::Acquire)
+    }
+
+    pub fn has_connected_once(&self) -> bool {
+        self.connection_ever_online.load(Ordering::Acquire)
+    }
+
+    /// Returns true when this call changed the connection from offline to online.
+    pub fn mark_connection_online(&self) -> bool {
+        self.connection_ever_online.store(true, Ordering::Release);
+        !self.connection_online.swap(true, Ordering::AcqRel)
+    }
+
+    /// Returns true when this call changed the connection from online to offline.
+    pub fn mark_connection_offline(&self) -> bool {
+        self.connection_online.swap(false, Ordering::AcqRel)
+    }
+
+    pub fn request_reconnect(&self) {
+        let next = self
+            .reconnect_generation
+            .fetch_add(1, Ordering::AcqRel)
+            .wrapping_add(1);
+        self.reconnect_tx.send_replace(next);
+    }
+
+    pub fn reconnect_receiver(&self) -> watch::Receiver<u64> {
+        self.reconnect_tx.subscribe()
     }
 
     pub async fn remember_switch(&self, instance_id: String, settings: SwitchSettings) {

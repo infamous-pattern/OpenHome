@@ -5,7 +5,8 @@ use openaction::{Action, ActionUuid, Instance, OpenActionResult, send_arbitrary_
 use serde_json::{Number, Value};
 
 use crate::actions::common::{
-    action_error, apply_global_settings, display_title, parse_request, send_catalog,
+    action_error, apply_global_settings, display_title, looks_like_connection_error, parse_request,
+    send_catalog,
 };
 use crate::models::{AdjustStateSettings, Characteristic, SelectedCharacteristic};
 use crate::state::PluginState;
@@ -44,6 +45,7 @@ impl AdjustStateAction {
                 .client
                 .get_accessory(&global, None, &settings.accessory_id)
                 .await?;
+            self.state.mark_connection_online();
             let characteristic = service
                 .characteristic_by_identity(
                     settings.characteristic_uuid(),
@@ -130,6 +132,7 @@ pub async fn refresh_adjust_instance(
         .await
     {
         Ok(service) => {
+            state.mark_connection_online();
             let Some(characteristic) = service.characteristic_by_identity(
                 settings.characteristic_uuid(),
                 settings.characteristic_type(),
@@ -158,7 +161,29 @@ pub async fn refresh_adjust_instance(
             )
             .await
         }
-        Err(error) => action_error(instance, "Offline", error, show_alert).await,
+        Err(error) => {
+            let message = error.to_string();
+            if looks_like_connection_error(&message) {
+                state.mark_connection_offline();
+                state.request_reconnect();
+                if show_alert {
+                    action_error(instance, "Offline", error, true).await
+                } else {
+                    if !state.has_connected_once() {
+                        instance.set_title(Some("Connecting…"), None).await?;
+                    }
+                    if state
+                        .should_log_error(&format!("adjust:{}", instance.instance_id), &message)
+                        .await
+                    {
+                        log::warn!("Adjust {}: {message}", instance.instance_id);
+                    }
+                    Ok(())
+                }
+            } else {
+                action_error(instance, "Homebridge\nerror", error, show_alert).await
+            }
+        }
     }
 }
 
@@ -245,6 +270,15 @@ impl Action for AdjustStateAction {
         self.state
             .remember_adjust(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return refresh_adjust_instance(&self.state, instance, settings, false).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            return Ok(());
+        }
         refresh_adjust_instance(&self.state, instance, settings, false).await
     }
 
@@ -283,6 +317,16 @@ impl Action for AdjustStateAction {
         self.state
             .remember_adjust(instance.instance_id.clone(), settings.clone())
             .await;
+        if !settings.is_configured() {
+            return refresh_adjust_instance(&self.state, instance, settings, false).await;
+        }
+        if !self.state.global_settings_loaded() || !self.state.connection_online() {
+            if !self.state.has_connected_once() {
+                instance.set_title(Some("Connecting…"), None).await?;
+            }
+            self.state.request_reconnect();
+            return Ok(());
+        }
         refresh_adjust_instance(&self.state, instance, settings, false).await
     }
 

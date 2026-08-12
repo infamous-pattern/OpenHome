@@ -1,6 +1,6 @@
 [package]
 name = "openhomeb"
-version = "2.0.1"
+version = "2.0.2"
 edition = "2024"
 authors = ["Infamous Pattern"]
 description = "A Linux-native OpenDeck plugin for discovering and controlling Homebridge accessories, including brightness."
