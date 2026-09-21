@@ -24,7 +24,7 @@ class PackageContractTests(unittest.TestCase):
         self.assertEqual(manifest["Name"], "OpenHomeB")
         self.assertEqual(manifest["Category"], "OpenHomeB")
         self.assertEqual(manifest["Author"], "Infamous Pattern")
-        self.assertEqual(manifest["Version"], "2.0.2")
+        self.assertEqual(manifest["Version"], "2.0.3")
         self.assertEqual(manifest["OS"], [{"Platform": "linux"}])
         self.assertIn("x86_64-unknown-linux-gnu", manifest["CodePaths"])
         self.assertIn("aarch64-unknown-linux-gnu", manifest["CodePaths"])
@@ -183,16 +183,16 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("function characteristicKey", inspector)
         self.assertIn("characteristicUuid", inspector)
 
-    def test_version_2_0_2_is_consistent_across_release_metadata(self):
+    def test_version_2_0_3_is_consistent_across_release_metadata(self):
         cargo = (ROOT / "Cargo.toml").read_text()
         manifest = json.loads((ROOT / "assets" / "manifest.json").read_text())
         homebridge = (ROOT / "src" / "homebridge.rs").read_text()
         release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
 
-        self.assertIn('version = "2.0.2"', cargo)
-        self.assertEqual(manifest["Version"], "2.0.2")
-        self.assertIn('OpenHomeB/2.0.2', homebridge)
-        self.assertTrue((ROOT / "RELEASE_NOTES_2.0.2.md").is_file())
+        self.assertIn('version = "2.0.3"', cargo)
+        self.assertEqual(manifest["Version"], "2.0.3")
+        self.assertIn('OpenHomeB/2.0.3', homebridge)
+        self.assertTrue((ROOT / "RELEASE_NOTES_2.0.3.md").is_file())
         self.assertNotIn("RELEASE_NOTES_2.0.0.md", release_workflow)
         self.assertIn('RELEASE_NOTES_${version}.md', release_workflow)
 

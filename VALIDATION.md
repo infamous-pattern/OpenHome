@@ -1,3 +1,19 @@
+# Validation status — version 2.0.3
+
+## Local checks — 21 September 2026
+
+- Cargo audit passed with no vulnerabilities; one allowed warning remains for inactive optional `chacha20 0.10.1`.
+- Rust formatting passed (`cargo fmt --all -- --check`).
+- All 13 Rust tests passed (`cargo test --all-targets --locked`).
+- Clippy passed with warnings denied (`cargo clippy --all-targets --locked -- -D warnings`).
+- Property-inspector JavaScript syntax and behaviour checks passed.
+- All 22 Python API and package-contract tests passed. Python emitted HTTPError cleanup ResourceWarnings; no tests failed.
+- Package version, manifest version, HTTP user agent, release helper, and package-contract expectations are aligned at 2.0.3.
+
+The tagged release workflow validates the source again, builds both x86_64 and aarch64 Linux binaries, and publishes the universal plugin package, source archives, release notes, and checksums. Live OpenDeck/Homebridge interaction was not retested for this dependency maintenance release.
+
+## Historical validation
+
 # Validation status — version 2.0.2
 
 Validated in the artifact-generation environment on 12 August 2026.

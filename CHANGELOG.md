@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3 — 2026-09-21
+
+- Updated rustls from 0.23.42 to 0.23.45 to fix RUSTSEC-2026-0285.
+- Updated rustls-webpki from 0.103.13 to 0.103.15 to satisfy the patched rustls dependency.
+- Rebuilt Linux plugin packages with the patched dependencies.
+
 ## 2.0.2 — 2026-08-12
 
 - Added automatic startup connection recovery after Fedora login.
