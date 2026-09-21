@@ -85,7 +85,7 @@ impl HomebridgeClient {
         let client = Client::builder()
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(20))
-            .user_agent("OpenHomeB/2.0.2")
+            .user_agent("OpenHomeB/2.0.3")
             .build()
             .context("could not create the Homebridge HTTP client")?;
 

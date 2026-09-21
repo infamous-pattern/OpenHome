@@ -2,7 +2,7 @@
 
 A Linux-native OpenDeck/OpenAction plugin for discovering and controlling accessories exposed by Homebridge Config UI.
 
-**Current version: 2.0.2**
+**Current version: 2.0.3**
 
 ![OpenHomeB overview](docs/screenshots/overview.png)
 
@@ -16,6 +16,8 @@ A Linux-native OpenDeck/OpenAction plugin for discovering and controlling access
 ![OpenHomeB Brightness action](docs/screenshots/brightness-action.png)
 
 </details>
+
+Version 2.0.3 updates rustls to 0.23.45 to fix RUSTSEC-2026-0285, with rustls-webpki updated to 0.103.15.
 
 Version 2.0.2 adds automatic startup and reconnect recovery so OpenHomeB refreshes itself when Fedora networking or Homebridge becomes available after OpenDeck starts. It also retains the complete 2.0 feature set: dedicated brightness controls, shared discovery caching, proactive authentication renewal, richer device metadata, compatibility parsing, and configurable button labels.
 
